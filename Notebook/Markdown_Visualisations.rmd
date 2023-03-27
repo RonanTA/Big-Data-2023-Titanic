@@ -1,0 +1,128 @@
+---
+title: "Visualistations annexes"
+output: html_document
+date: '2023-03-14'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+base <- read.csv("C:/Users/Anron/Desktop/GitHub/BigData_2023/Data/export.csv")
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+export %>%
+ filter(!(Sex %in% "")) %>%
+ ggplot() +
+ aes(x = FoodCourt, y = Transported, colour = Transported) +
+ geom_boxplot(fill = "#112446") +
+ scale_color_hue(direction = 1) +
+ theme_minimal()
+
+export %>%
+ filter(!(Sex %in% "")) %>%
+ ggplot() +
+ aes(x = FoodCourt, y = Transported, colour = Transported) +
+ geom_boxplot(fill = "#112446") +
+ scale_color_hue(direction = 1) +
+ labs(x = "Montant dépensé", title = "Distribution des passagers en fonctions du montant dépensé et du transport") +
+ theme_minimal()
+
+export %>%
+ filter(!(Sex %in% "")) %>%
+ ggplot() +
+ aes(x = FoodCourt, y = Transported, colour = Transported) +
+ geom_boxplot(fill = "#112446") +
+ scale_color_hue(direction = 1) +
+ labs(x = "Montant dépensé", title = "Distribution des passagers en fonctions du montant dépensé au \"FoodCourt\" et du transport") +
+ theme_minimal() +
+ theme(plot.title = element_text(size = 10L, face = "bold", hjust = 0.5))
+
+export %>%
+ filter(!(Sex %in% "")) %>%
+ ggplot() +
+ aes(x = ShoppingMall, y = Transported, colour = Transported) +
+ geom_boxplot(fill = "#112446") +
+ scale_color_hue(direction = 1) +
+ labs(x = "Montant dépensé", title = "Distribution des passagers en fonctions du montant dépensé au \"ShoppingMall\" et du transport") +
+ theme_minimal() +
+ theme(plot.title = element_text(size = 10L, face = "bold", hjust = 0.5))
+```
+
+
+```{r}
+library(dplyr)
+library(questionr)
+library(tidyverse)
+library(readxl)
+library(tidyr)
+
+## Recodage de export$Transported
+export$Transported <- export$Transported %>%
+  fct_recode(
+    "0" = "False",
+    "1" = "True"
+  )
+
+## Recodage de export$HomePlanet
+export$HomePlanet <- export$HomePlanet %>%
+  fct_recode(
+    "Terre" = "Earth"
+  )
+
+test1 <- export[,-c(1,7,9)]
+
+regression2 <- glm(data = test1,
+           formula = Transported ~ .,
+           family = binomial(logit))
+```
+
+```{r}
+summary(regression2)
+```
+
+```{r}
+test <- export[,-c(1,5,7,9)]
+predicted <- predict(regression2, test1, type="response")
+```
+
+```{r}
+optimal <- OptimalCutoff(test1$Transported, predicted)[1]
+```
+
+```{r}
+logitMod <- glm(Transported ~ ., data=test1, family=binomial(link="logit"))
+
+library(caret)
+# Use your model to make predictions, in this example newdata = training set, but replace with your test set    
+predicted <- predict(regression2, test1, type="response")
+
+# use caret and compute a confusion matrix
+confusionMatrix(data = as.numeric(predicted>0.5), reference = test1)
+
+data = as.numeric(regression2$fitted.values>0.5)
+```
+
+
+```{r}
+pred_values <- factor(data)
+actual_values<- factor(test1$Transported)
+```
+
+
+```{r}
+# Confusion Matrix
+cf <- caret::confusionMatrix(data=pred_values,
+                     reference=actual_values)
+print(cf)
+```
+*
+*
+
+
