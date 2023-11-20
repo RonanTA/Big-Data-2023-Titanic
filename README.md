@@ -1,5 +1,5 @@
-# Big-Data-2023-Groupe-8B
-Ce dépôt Git est consacré entièrement au projet de Big Data.
+# Kaggle TITANIC
+Ce dépôt Git est consacré entièrement au projet Kaggle Titanic
 
 Ce fichier se décompose en 3 parties distinctes qui sont :
 
